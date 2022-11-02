@@ -1,0 +1,2 @@
+export FLASK_NEW=development
+export FLASK_APP=src
