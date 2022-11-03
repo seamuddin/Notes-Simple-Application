@@ -5,8 +5,7 @@ def create_app(test_config=None):
 
     if test_config is None:
         app.config.from_mapping(
-            SECRET_KEY =os.environ.get("dev")
-
+            SECRET_KEY =os.environ.get("dev"),
         )
     else:
         app.config.from_mapping(test_config)
