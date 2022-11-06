@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rocking Notes 2021</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        table ,th, td
+        {
+            border: 1px solid #0088cc;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+        table td
+        {
+            width: 300px;
+        }
+        table td:first-child
+        {
+            font-weight:bold;
+        }
+    </style>
+</head>
+<body style="padding: 25px">
+    <H1  style="font-family: 'Roboto', sans-serif; font-size: 3em">Rocking Notes 2021 API Documentation</H1>
+    <H3  style="font-family: 'Roboto', sans-serif; font-size: 1.5em"><span style="color: #0088cc;">USER</span> | Create a new User</H3>
+    <div style="display: flex; align-items: center; padding: 5px"><p style="margin: 5px">URL -</p> <a href="127.0.0.1:5000/api/v1/auth/register">127.0.0.1:5000/api/v1/auth/register</a></div>
+    <H3  style="font-family: 'Roboto', sans-serif; font-size: 1em; padding: 4px; margin: 5px"><span style="color: #0088cc;">Method</span> - POST</H3>
+    <h2>Request Body-</h2>
+    <table>
+            <tr>
+                <th>Field Name</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>username</td>
+                <td>string</td>
+                <td>Name of the user</td>
+            </tr>
+
+            <tr>
+                <td>Email</td>
+                <td>string</td>
+                <td>email of the user</td>
+            </tr>
+
+            <tr>
+                <td>Password</td>
+                <td>string</td>
+                <td>password of the user</td>
+            </tr>
+    </table>
+
+
+
+</body>
+</html>
