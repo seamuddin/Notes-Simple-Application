@@ -7,6 +7,8 @@ from src.constants.http_status_code import *
 from flask_jwt_extended import JWTManager
 def create_app(test_config=None):
     app = Flask(__name__,instance_relative_config=True)
+    if __name__ == '__main__':
+        app.run(debug=True)
 
     if test_config is None:
         app.config.from_mapping(
