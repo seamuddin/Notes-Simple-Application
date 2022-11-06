@@ -27,3 +27,6 @@ class Notes(Model):
     class Meta:
         database = db
 
+    def __repr__(self):
+        return self.title
+
