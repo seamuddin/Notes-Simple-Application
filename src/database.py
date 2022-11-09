@@ -2,6 +2,8 @@ from peewee import *
 from datetime import datetime
 
 db = SqliteDatabase('main.db')
+db.connect()
+
 
 class User(Model):
     id = IntegerField(primary_key=True)
@@ -16,6 +18,7 @@ class User(Model):
 
     def __repr__(self):
         return self.username
+User.create_table()
 
 class Notes(Model):
     id = IntegerField(primary_key=True)
@@ -29,4 +32,6 @@ class Notes(Model):
 
     def __repr__(self):
         return self.title
+
+Notes.create_table()
 

@@ -7,7 +7,7 @@ note = Blueprint("note", __name__, url_prefix="/api/v1/note")
 from src.database import db, Notes
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
-
+from peewee import *
 
 @note.route('/', methods=['POST', 'GET'])
 @jwt_required()
@@ -18,23 +18,26 @@ def create_note():
         body = request.form.get('body')
         tags = request.form.get('tags')
 
+        with db.atomic() as transaction:
+            try:
+                Notes.create(title=title, body=body, tag=tags, user_id=current_user)
+                transaction.commit()
+                return jsonify({
+                    'message': 'Note Created',
+                    'note':
+                        {
+                            'title': title,
+                            'body': body,
+                            'tags': tags
+                        }
+                }), HTTP_201_CREATED
+            except DatabaseError:
+                transaction.rollback()
+                return jsonify({'error': 'Notes Can not Create'}), HTTP_406_NOT_ACCEPTABLE
 
 
-        with db.transaction() as note:
-
-            note = Notes.create(title=title, body=body, tag=tags,user_id=current_user)
-            note.commit()
 
 
-        return jsonify({
-            'message': 'Note Created',
-            'note':
-                {
-                    'title': title,
-                    'body': body,
-                    'tags': tags
-                }
-        }), HTTP_201_CREATED
 
     else:
         notes = Notes.select().where(Notes.user_id==current_user)
@@ -54,6 +57,8 @@ def create_note():
             'data':data
         }),HTTP_200_OK
 
+    return jsonify({'error': 'Notes Can not Create'}), HTTP_406_NOT_ACCEPTABLE
+
 
 @note.put('/<int:id>')
 @jwt_required()
@@ -65,21 +70,30 @@ def update_notes(id):
         tags = request.form.get('tags')
 
         if title and body and tags:
-            with db.transaction() as note:
-                note =Notes.update(title=title, body=body, tag=tags, user_id=current_user).where(Notes.id==id)
-                note.save()
 
-            return jsonify({
-                'message': 'Note Created',
-                'note':
-                    {
-                        'title': title,
-                        'body': body,
-                        'tags': tags
-                    }
-            }), HTTP_200_OK
+            with db.atomic() as transaction:
+                try:
+                    note = Notes.get(id=id)
+                    note.title = title
+                    note.body = body
+                    note.tag =  tags
+                    note.user_id = current_user
+                    note.save()
+                    return jsonify({
+                        'message': 'Note Updated',
+                        'note':
+                            {
+                                'title': note.title,
+                                'body': note.body,
+                                'tags': note.tag
+                            }
+                    }), HTTP_200_OK
+                except DatabaseError:
+                    transaction.rollback()
+                    return jsonify({'error': 'Notes Can not Update'}), HTTP_406_NOT_ACCEPTABLE
 
-        return jsonify({'error': 'Notes Can not Update'}), HTTP_406_NOT_ACCEPTABLE
+    return jsonify({'error': 'Notes Can not Update'}), HTTP_406_NOT_ACCEPTABLE
+
 
 
 
@@ -89,14 +103,14 @@ def delete_note(id):
     current_user = get_jwt_identity()
     if request.method == 'DELETE':
         if id:
-
-            with db.transaction() as note:
-                note = Notes.delete().where(Notes.id==id)
-                note.commit()
-                return jsonify({
-                    'message': 'Note Deleted'
-                }), HTTP_200_OK
-
-
-
+            with db.atomic() as transaction:
+                try:
+                    Notes.delete().where(Notes.id==id)
+                    transaction.commit()
+                    return jsonify({
+                        'message': 'Note Deleted'
+                    }), HTTP_200_OK
+                except DatabaseError:
+                    transaction.rollback()
+                    return jsonify({'error': 'Notes Can not Update'}), HTTP_406_NOT_ACCEPTABLE
         return jsonify({'error': 'Notes Can not Delete'}), HTTP_406_NOT_ACCEPTABLE

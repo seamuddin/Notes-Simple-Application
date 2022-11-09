@@ -17,63 +17,73 @@ def register():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    if len(password) < 6:
-        return jsonify(
-            {
-                'error' : 'Password is too short'
-            }
-        ),HTTP_400_BAD_REQUEST
-
-    if len(username) < 3:
-        return jsonify(
-            {
-                'error' : 'User Name is too short'
-            }
-        ),HTTP_400_BAD_REQUEST
-
-    if not username.isalnum() or " " in username:
-        return jsonify({'error': "Username should be alphanumeric, also no spaces"}), HTTP_400_BAD_REQUEST
-
-
-    if not validators.email(email):
-        return jsonify(
-            {
-                'error': 'Email is not valid '
-            }
-        ), HTTP_400_BAD_REQUEST
-
-    if User.select().where(User.email==email).first() is not None:
-        return jsonify(
-            {
-                'error': 'Email is already taken '
-            }
-        ), HTTP_409_CONFLICT
-
-    if User.select().where(User.username==username).first() is not None:
-        return jsonify(
-            {
-                'error': 'Username is already taken '
-            }
-        ), HTTP_409_CONFLICT
-
-    pwd_password = generate_password_hash(password)
-
-    with db.transaction() as txn:
-        User.create(username=username, password=pwd_password, email=email)
-        txn.commit()
-
-    return jsonify(
-        {
-            'message': 'User Created',
-            'user':
+    if password :
+        if len(password) < 6:
+            return jsonify(
                 {
-                    'username': username,
-                    'email': email
+                    'error' : 'Password is too short'
                 }
+            ),HTTP_400_BAD_REQUEST
 
-        }
-    ), HTTP_201_CREATED
+    if username:
+        if len(username) < 3:
+            return jsonify(
+                {
+                    'error' : 'User Name is too short'
+                }
+            ),HTTP_400_BAD_REQUEST
 
+        if not username.isalnum() or " " in username:
+            return jsonify({'error': "Username should be alphanumeric, also no spaces"}), HTTP_400_BAD_REQUEST
+
+        if User.select().where(User.username == username).first() is not None:
+            return jsonify(
+                {
+                    'error': 'Username is already taken '
+                }
+            ), HTTP_409_CONFLICT
+
+    if email:
+        if not validators.email(email):
+            return jsonify(
+                {
+                    'error': 'Email is not valid '
+                }
+            ), HTTP_400_BAD_REQUEST
+
+        if User.select().where(User.email==email).first() is not None:
+            return jsonify(
+                {
+                    'error': 'Email is already taken '
+                }
+            ), HTTP_409_CONFLICT
+
+
+
+    if password:
+
+        pwd_password = generate_password_hash(password)
+
+    if username and email and pwd_password:
+        with db.transaction() as txn:
+            User.create(username=username, password=pwd_password, email=email)
+            txn.commit()
+
+        return jsonify(
+            {
+                'message': 'User Created',
+                'user':
+                    {
+                        'username': username,
+                        'email': email
+                    }
+
+            }
+        ), HTTP_201_CREATED
+
+    return jsonify({
+        'message' : "User can't create",
+    }), HTTP_406_NOT_ACCEPTABLE
 
 
 @auth.post('/login')

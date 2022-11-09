@@ -3,8 +3,13 @@ import os
 from src.database import db
 from src.auth import auth
 from src.note import note
+from src.main import home
 from src.constants.http_status_code import *
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
+
+
+
 def create_app(test_config=None):
     app = Flask(__name__,instance_relative_config=True)
 
@@ -19,6 +24,8 @@ def create_app(test_config=None):
 
     app.register_blueprint(auth)
     app.register_blueprint(note)
+    app.register_blueprint(home)
+    migrate = Migrate(app, db)
 
     JWTManager(app)
 
